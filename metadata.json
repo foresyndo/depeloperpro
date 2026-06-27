@@ -1,0 +1,12 @@
+{
+  "name": "DeveloperPro ERP",
+  "description": "Enterprise Resource Planning (ERP) for Property and Real Estate Developers with built-in WhatsApp Gateway Notifications, land tracking, S-Curve project milestone visualization, QR e-signature validation, and Gemini AI KK parsing.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
