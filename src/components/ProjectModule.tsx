@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Project, LandAcquisition, ProjectMilestone, ConstructionLog } from '../types';
+import { Project, LandAcquisition, ProjectMilestone, ConstructionLog, Sales } from '../types';
 import { formatRupiah, exportToExcel } from '../utils/helpers';
+import { exportReportToPDF } from '../utils/pdfExport';
 import { 
-  Plus, Calendar, Map, ClipboardList, TrendingUp, HardHat, CloudSun
+  Plus, Calendar, Map, ClipboardList, TrendingUp, HardHat, CloudSun, Download
 } from 'lucide-react';
 
 interface ProjectModuleProps {
   projects: Project[];
+  salesList: Sales[];
   onUpdateMilestone: (projectId: string, milestoneId: string, progress: number, status: ProjectMilestone['status']) => void;
   onAddConstructionLog: (projectId: string, log: ConstructionLog) => void;
   onAddLandAcquisition: (projectId: string, land: LandAcquisition) => void;
@@ -16,6 +18,7 @@ interface ProjectModuleProps {
 
 export default function ProjectModule({
   projects,
+  salesList,
   onUpdateMilestone,
   onAddConstructionLog,
   onAddLandAcquisition,
@@ -136,7 +139,20 @@ export default function ProjectModule({
           <p className="text-xs text-slate-400 font-semibold">Mengawasi progres S-Curve, pembebasan lahan kavling, perizinan SIP/PBG, dan buku harian konstruksi</p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full md:w-auto justify-end">
+          <button
+            type="button"
+            id="export-pdf-project-btn"
+            onClick={() => {
+              exportReportToPDF(salesList, projects);
+              addAuditLog('PDF_EXPORT', 'Mengekspor laporan teknis & keuangan ke PDF dari modul proyek');
+            }}
+            className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Ekspor Laporan PDF
+          </button>
+
           <select
             value={selectedProjectId}
             onChange={e => setSelectedProjectId(e.target.value)}

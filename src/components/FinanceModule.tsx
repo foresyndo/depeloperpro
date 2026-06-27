@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sales, Project } from '../types';
 import { formatRupiah, exportToExcel } from '../utils/helpers';
+import { exportReportToPDF } from '../utils/pdfExport';
 import { 
   Plus, Search, Download, Eye, User, FileUp, 
   Sparkles, CheckCircle2, ShieldAlert
@@ -252,6 +253,19 @@ export default function FinanceModule({
 
             {/* Actions */}
             <div className="flex gap-2 w-full md:w-auto justify-end">
+              <button
+                type="button"
+                id="export-pdf-finance-btn"
+                onClick={() => {
+                  exportReportToPDF(salesList, projects);
+                  addAuditLog('PDF_EXPORT', 'Mengekspor laporan keuangan & konstruksi stakeholder ke PDF');
+                }}
+                className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Ekspor Laporan PDF
+              </button>
+
               <button
                 type="button"
                 onClick={handleExport}

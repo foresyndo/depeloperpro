@@ -340,6 +340,7 @@ export default function App() {
           {activeTab === 'project' && (
             <ProjectModule
               projects={projects}
+              salesList={salesList}
               onUpdateMilestone={handleUpdateMilestone}
               onAddConstructionLog={handleAddConstructionLog}
               onAddLandAcquisition={handleAddLandAcquisition}

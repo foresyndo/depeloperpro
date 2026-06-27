@@ -6,8 +6,9 @@ import { formatRupiah, generateQRUrl } from '../utils/helpers';
 import { STAKEHOLDER_DIRECTORY, buildProcurementPOTemplate, buildDocumentStepApprovedTemplate, buildProjectMilestoneTemplate, sendWhatsAppNotification } from '../utils/whatsapp';
 import { 
   Users, AlertCircle, Briefcase, FileSignature, BookOpen, Download, 
-  Terminal, Settings, Send, CheckCircle2, RefreshCw, Plus, ShieldAlert
+  Terminal, Settings, Send, CheckCircle2, RefreshCw, Plus, ShieldAlert, Camera
 } from 'lucide-react';
+import QRScannerModal from './QRScannerModal';
 
 interface CoreModulesProps {
   campaigns: MarketingCampaign[];
@@ -136,6 +137,7 @@ export default function CoreModules({
   const [selectedQRDocId, setSelectedQRDocId] = useState<string | null>(null);
   const [simulatedScanStatus, setSimulatedScanStatus] = useState<'idle' | 'scanning' | 'verified' | 'error'>('idle');
   const [scannedDocData, setScannedDocData] = useState<DocumentHub | null>(null);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
 
   const handleOpenQRModal = (docId: string) => {
     setSelectedQRDocId(docId);
@@ -624,11 +626,22 @@ export default function CoreModules({
       {/* ---------------------------------------------------- */}
       {activeTab === 'docs' && (
         <div className="space-y-6">
-          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex items-center gap-3">
-            <FileSignature className="h-5 w-5 text-blue-600" />
-            <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
-              <strong>E-Signature Integrity:</strong> Sistem ERP menyematkan penanda hash kriptografi ke dalam dokumen persetujuan kerja sama. Klik <strong>E-Signature Validasi QR</strong> untuk mensimulasikan pemindaian kamera dan mengonfirmasi keaslian dokumen di lapangan.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex items-center gap-3 flex-1">
+              <FileSignature className="h-5 w-5 text-blue-600 shrink-0" />
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
+                <strong>E-Signature Integrity:</strong> Sistem ERP menyematkan penanda hash kriptografi ke dalam dokumen persetujuan kerja sama. Klik <strong>E-Signature Validasi QR</strong> untuk melihat QR dokumen atau klik tombol kamera untuk memindai berkas cetak fisik secara langsung.
+              </p>
+            </div>
+            <button
+              type="button"
+              id="camera-qr-scanner-main-btn"
+              onClick={() => setIsQRScannerOpen(true)}
+              className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <Camera className="h-4 w-4" />
+              Pindai QR Berkas Fisik
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1095,14 +1108,28 @@ export default function CoreModules({
               <div className="w-full pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                 
                 {simulatedScanStatus === 'idle' && (
-                  <button
-                    type="button"
-                    onClick={handleSimulateScan}
-                    className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Simulasikan Pemindaian Lapangan (Kamera)
-                  </button>
+                  <div className="flex flex-col gap-2 w-full">
+                    <button
+                      type="button"
+                      onClick={handleSimulateScan}
+                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Simulasikan Pemindaian Lapangan (MOCK)
+                    </button>
+                    <button
+                      type="button"
+                      id="open-real-cam-from-doc-modal"
+                      onClick={() => {
+                        setSelectedQRDocId(null); // Close this mock modal first
+                        setIsQRScannerOpen(true); // Open the real camera scanner modal
+                      }}
+                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Camera className="h-4 w-4" />
+                      Pindai Langsung via Kamera Real-Time
+                    </button>
+                  </div>
                 )}
 
                 {simulatedScanStatus === 'scanning' && (
@@ -1149,6 +1176,15 @@ export default function CoreModules({
           </div>
         </div>
       )}
+
+      <QRScannerModal
+        isOpen={isQRScannerOpen}
+        onClose={() => setIsQRScannerOpen(false)}
+        docs={docs}
+        onVerified={(doc) => {
+          addAuditLog('E_SIGNATURE_QR_VERIFY', `Memverifikasi keaslian dokumen ${doc.title} (ID: ${doc.id}) menggunakan kamera pemindai QR fisik`);
+        }}
+      />
 
     </div>
   );

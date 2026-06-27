@@ -1,12 +1,13 @@
 import { Project, Sales, DocumentHub, CSComplaint } from '../types';
 import { formatRupiah } from '../utils/helpers';
+import { exportReportToPDF } from '../utils/pdfExport';
 import { 
   ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend,
   BarChart, Bar
 } from 'recharts';
 import { 
   Building2, DollarSign, MapPin, Landmark, ArrowUpRight, 
-  CheckCircle2, AlertTriangle, FileText, Activity
+  CheckCircle2, AlertTriangle, FileText, Activity, Download
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -79,8 +80,19 @@ export default function Dashboard({ projects, sales, docs, complaints, onNavigat
             DeveloperPro ERP • Real-Time Enterprise Analytics
           </p>
         </div>
-        <div className="text-right text-[11px] font-mono text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg shadow-sm">
-          SISTEM AKTIF • UTC: {new Date().toISOString().slice(0, 16).replace('T', ' ')}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            id="export-pdf-dashboard-btn"
+            onClick={() => exportReportToPDF(sales, projects)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Ekspor Laporan PDF
+          </button>
+          <div className="text-right text-[11px] font-mono text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg shadow-sm">
+            SISTEM AKTIF • UTC: {new Date().toISOString().slice(0, 16).replace('T', ' ')}
+          </div>
         </div>
       </div>
 
